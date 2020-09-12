@@ -88,6 +88,7 @@ class somemodule extends Module {
         $helper->no_link = true;
         $helper->show_toolbar = true;
         $helper->module = $this;
+        $helper->actions = ['configure'];
         $helper->orderBy = 'id_module';
         $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -122,5 +123,21 @@ class somemodule extends Module {
                 return $module->enable();
             }
         }
+    }
+
+    public function displayConfigureLink($token, $id, $name = null)
+    {
+        $module = Module::getInstanceByName($name);
+        if(!method_exists($module, 'getContent') || !$module->active)
+            return;
+        $href = $this->context->link->getAdminLink('AdminModules', true, [], [
+            'configure' => $name,
+        ]);
+        $this->context->smarty->assign(array(
+            'href' => $href,
+            'action' => Context::getContext()->getTranslator()->trans('Configure', array(), 'Admin.Actions'),
+            'id' => $id,
+        ));
+        return $this->fetch('module:somemodule/views/templates/admin/list_action_configure.tpl');
     }
 }
