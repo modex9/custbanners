@@ -14,11 +14,7 @@ class somemodule extends Module {
     }
 
     public function install() {
-        return parent::install();
-    }
-
-    public function uninstall() {
-        return parent::uninstall();
+        return parent::install() && $this->registerHook('backofficeHeader');
     }
 
     public function getContent() {
@@ -178,5 +174,11 @@ class somemodule extends Module {
             }
         }
         return $translateLinks;
+    }
+
+    public function hookDisplayBackofficeHeader($params) {
+        if (Tools::getIsset('configure') && Tools::getValue('configure') == $this->name) {
+            $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
+        }
     }
 }
