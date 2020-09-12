@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>somemodule</name>
+    <displayName><![CDATA[Some module]]></displayName>
+    <version><![CDATA[1.0]]></version>
+    <description><![CDATA[Experimental module.]]></description>
+    <author><![CDATA[Modestas Slivinskas]]></author>
+    <tab><![CDATA[]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>
