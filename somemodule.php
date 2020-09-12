@@ -23,15 +23,28 @@ class somemodule extends Module {
 
     public function getContent() {
 
-        $modules = Module::getModulesOnDisk();
+        if($this->postProcess()) {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true, [], [
+                'configure' => $this->name,
+            ]));
+        }
+        $modules = Db::getInstance()->executeS(
+            (new DbQuery())
+            ->select("id_module")
+            ->from("module")
+        );
         $modules_array = [];
-        $tmp_module = [];
         foreach($modules as $module) {
-            if($module->id != 0) {
-                $tmp_module = (array) $module;
-                $tmp_module['id_module'] = $module->id;
-                $modules_array[] = (array) $tmp_module;
-            }
+            $module_obj = Module::getInstanceById($module['id_module']);
+            $modules_array[] = [
+                'id_module' => $module_obj->id,
+                'displayName' => $module_obj->displayName,
+                'name' => $module_obj->name,
+                'version' => $module_obj->version,
+                'author' => $module_obj->author,
+                'active' => $module_obj->active,
+            ];
+
         }
 
         $fields_list = array(
@@ -40,8 +53,13 @@ class somemodule extends Module {
                 'type' => 'text',
                 'search' => true
             ],
+            'name' => [
+                'title' => $this->trans('Name', [], 'Admin.Global'),
+                'type' => 'text',
+                'search' => true
+            ],
             'displayName' => [
-                'title' => $this->trans('Module Name', [], 'Admin.Global'),
+                'title' => $this->trans('Display Name', [], 'Admin.Global'),
                 'type' => 'text',
                 'search' => true
             ],
@@ -78,4 +96,31 @@ class somemodule extends Module {
         return $helper->generateList($modules_array, $fields_list);
     }
     
+    public function postProcess() {
+        if (Tools::isSubmit('statusmodule') && Tools::getValue('id_module'))
+        {
+            // Change status of module
+            $id_module = Tools::getValue('id_module');
+            if (!$id_module || !Validate::isUnsignedId($id_module))
+            {
+                $this->_errors[] = $this->l('Invalid module ID.');
+                return false;
+            }
+
+            $module = Module::getInstanceById($id_module);
+            if (!Validate::isLoadedObject($module))
+            {
+                $this->_errors[] = $this->l('Can\'t find module with this ID.');
+                return false;
+            }
+
+            if($module->active)
+            {
+                return $module->disable();
+            }
+            else {
+                return $module->enable();
+            }
+        }
+    }
 }
