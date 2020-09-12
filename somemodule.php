@@ -88,7 +88,7 @@ class somemodule extends Module {
         $helper->no_link = true;
         $helper->show_toolbar = true;
         $helper->module = $this;
-        $helper->actions = ['configure'];
+        $helper->actions = ['configure', 'translate'];
         $helper->orderBy = 'id_module';
         $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -139,5 +139,44 @@ class somemodule extends Module {
             'id' => $id,
         ));
         return $this->fetch('module:somemodule/views/templates/admin/list_action_configure.tpl');
+    }
+
+    public function displayTranslateLink($token, $id, $name = null)
+    {
+        $href = $this->context->link->getAdminLink('AdminModules', true, [], [
+            'configure' => $name,
+        ]);
+        $this->context->smarty->assign(array(
+            'href' => $href,
+            'action' => Context::getContext()->getTranslator()->trans('Translate', array(), 'Admin.Actions'),
+            'id' => $id,
+            'translateLinks' => $this->getModuleTranslationLinks($name),
+        ));
+        return $this->fetch('module:somemodule/views/templates/admin/list_action_translate.tpl');
+    }
+
+    public function getModuleTranslationLinks($module_name) {
+        $module = Module::getInstanceByName($module_name);
+        $languages = Language::getLanguages(false);
+        $translateLinks = array();
+        $isNewTranslateSystem = $module->isUsingNewTranslationSystem();
+        $link = Context::getContext()->link;
+        foreach ($languages as $lang) {
+            if ($isNewTranslateSystem) {
+                $translateLinks[$lang['iso_code']] = $link->getAdminLink('AdminTranslationSf', true, array(
+                    'lang' => $lang['iso_code'],
+                    'type' => 'modules',
+                    'selected' => $module->name,
+                    'locale' => $lang['locale'],
+                ));
+            } else {
+                $translateLinks[$lang['iso_code']] = $link->getAdminLink('AdminTranslations', true, array(), array(
+                    'type' => 'modules',
+                    'module' => $module->name,
+                    'lang' => $lang['iso_code'],
+                ));
+            }
+        }
+        return $translateLinks;
     }
 }
