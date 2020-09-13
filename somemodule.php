@@ -24,56 +24,83 @@ class somemodule extends Module {
                 'configure' => $this->name,
             ]));
         }
+        $no_order_fields = ['author', 'displayName', 'active'];
+        if(Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && !in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
+            $order_by = Tools::getValue('moduleOrderby') . " " . Tools::getValue('moduleOrderway');
+        }
+        elseif (Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
+            $order_other_by = Tools::getValue('moduleOrderby');
+            $order_other_way = Tools::getValue('moduleOrderway');
+        }
+        (Tools::getValue('moduleOrderway'));
         $modules = Db::getInstance()->executeS(
             (new DbQuery())
             ->select("id_module")
             ->from("module")
+            ->orderBy(isset($order_by) ? $order_by : 'id_module')
         );
         $modules_array = [];
-        foreach($modules as $module) {
-            $module_obj = Module::getInstanceById($module['id_module']);
-            $modules_array[] = [
-                'id_module' => $module_obj->id,
-                'displayName' => $module_obj->displayName,
-                'name' => $module_obj->name,
-                'version' => $module_obj->version,
-                'author' => $module_obj->author,
-                'active' => $module_obj->active,
-            ];
+        
+        if(isset($order_other_by) && isset($module_obj->$order_other_by)) {
+            foreach($modules as $key => $module) {
+                $module_obj = Module::getInstanceById($module['id_module']);
+                $modules_array[$module_obj->$order_other_by . $key] = [
+                    'id_module' => $module_obj->id,
+                    'displayName' => $module_obj->displayName,
+                    'name' => $module_obj->name,
+                    'version' => $module_obj->version,
+                    'author' => $module_obj->author,
+                    'active' => $module_obj->active,
+                ];
+            }
+        }
+        else {
+            foreach($modules as $module) {
+                $module_obj = Module::getInstanceById($module['id_module']);
+                $modules_array[] = [
+                    'id_module' => $module_obj->id,
+                    'displayName' => $module_obj->displayName,
+                    'name' => $module_obj->name,
+                    'version' => $module_obj->version,
+                    'author' => $module_obj->author,
+                    'active' => $module_obj->active,
+                ];
+            }
+        }
+        
 
+        if(isset($order_other_by) && isset($order_other_way)) {
+            if($order_other_way == 'desc')
+                krsort($modules_array);
+            else
+                ksort($modules_array);
         }
 
         $fields_list = array(
             'id_module' => [
                 'title' => $this->trans('Module ID', [], 'Admin.Global'),
                 'type' => 'text',
-                'search' => true
             ],
             'name' => [
                 'title' => $this->trans('Name', [], 'Admin.Global'),
                 'type' => 'text',
-                'search' => true
             ],
             'displayName' => [
                 'title' => $this->trans('Display Name', [], 'Admin.Global'),
                 'type' => 'text',
-                'search' => true
             ],
             'version' => [
                 'title' => $this->trans('Module Version', [], 'Admin.Global'),
                 'type' => 'text',
-                'search' => true
             ],
             'author' => [
                 'title' => $this->trans('Module Author', [], 'Admin.Global'),
                 'type' => 'text',
-                'search' => true
             ],
             'active' => [
                 'title' => $this->trans('Active', [], 'Admin.Global'),
                 'type' => 'bool',
                 'active' => 'status',
-                'search' => true
             ]
         );
 
@@ -86,6 +113,7 @@ class somemodule extends Module {
         $helper->module = $this;
         $helper->actions = ['configure', 'translate'];
         $helper->orderBy = 'id_module';
+        $helper->listTotal = count($modules_array);
         $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
