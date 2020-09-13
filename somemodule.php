@@ -19,62 +19,7 @@ class somemodule extends Module {
 
     public function getContent() {
 
-        if($this->postProcess()) {
-            Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true, [], [
-                'configure' => $this->name,
-            ]));
-        }
-        $no_order_fields = ['author', 'displayName', 'active'];
-        if(Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && !in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
-            $order_by = Tools::getValue('moduleOrderby') . " " . Tools::getValue('moduleOrderway');
-        }
-        elseif (Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
-            $order_other_by = Tools::getValue('moduleOrderby');
-            $order_other_way = Tools::getValue('moduleOrderway');
-        }
-        (Tools::getValue('moduleOrderway'));
-        $modules = Db::getInstance()->executeS(
-            (new DbQuery())
-            ->select("id_module")
-            ->from("module")
-            ->orderBy(isset($order_by) ? $order_by : 'id_module')
-        );
-        $modules_array = [];
-        
-        if(isset($order_other_by) && isset($module_obj->$order_other_by)) {
-            foreach($modules as $key => $module) {
-                $module_obj = Module::getInstanceById($module['id_module']);
-                $modules_array[$module_obj->$order_other_by . $key] = [
-                    'id_module' => $module_obj->id,
-                    'displayName' => $module_obj->displayName,
-                    'name' => $module_obj->name,
-                    'version' => $module_obj->version,
-                    'author' => $module_obj->author,
-                    'active' => $module_obj->active,
-                ];
-            }
-        }
-        else {
-            foreach($modules as $module) {
-                $module_obj = Module::getInstanceById($module['id_module']);
-                $modules_array[] = [
-                    'id_module' => $module_obj->id,
-                    'displayName' => $module_obj->displayName,
-                    'name' => $module_obj->name,
-                    'version' => $module_obj->version,
-                    'author' => $module_obj->author,
-                    'active' => $module_obj->active,
-                ];
-            }
-        }
-        
-
-        if(isset($order_other_by) && isset($order_other_way)) {
-            if($order_other_way == 'desc')
-                krsort($modules_array);
-            else
-                ksort($modules_array);
-        }
+        $this->postProcess();
 
         $fields_list = array(
             'id_module' => [
@@ -104,6 +49,7 @@ class somemodule extends Module {
             ]
         );
 
+        $modules_array = $this->getModules();
         $helper = new HelperList();
         $helper->shopLinkType = '';
         $helper->identifier = $this->identifier;
@@ -146,6 +92,9 @@ class somemodule extends Module {
             else {
                 return $module->enable();
             }
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true, [], [
+                'configure' => $this->name,
+            ]));
         }
     }
 
@@ -208,5 +157,60 @@ class somemodule extends Module {
         if (Tools::getIsset('configure') && Tools::getValue('configure') == $this->name) {
             $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
         }
+    }
+
+    public function getModules() {
+        $no_order_fields = ['author', 'displayName', 'active'];
+        if(Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && !in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
+            $order_by = Tools::getValue('moduleOrderby') . " " . Tools::getValue('moduleOrderway');
+        }
+        elseif (Tools::getIsset('moduleOrderby') && Tools::getIsset('moduleOrderway') && in_array(Tools::getValue('moduleOrderby'), $no_order_fields)) {
+            $order_other_by = Tools::getValue('moduleOrderby');
+            $order_other_way = Tools::getValue('moduleOrderway');
+        }
+
+        $modules = Db::getInstance()->executeS(
+            (new DbQuery())
+            ->select("id_module")
+            ->from("module")
+            ->orderBy(isset($order_by) ? $order_by : 'id_module')
+        );
+        $modules_array = [];
+        
+        if(isset($order_other_by) && isset($module_obj->$order_other_by)) {
+            foreach($modules as $key => $module) {
+                $module_obj = Module::getInstanceById($module['id_module']);
+                $modules_array[$module_obj->$order_other_by . $key] = [
+                    'id_module' => $module_obj->id,
+                    'displayName' => $module_obj->displayName,
+                    'name' => $module_obj->name,
+                    'version' => $module_obj->version,
+                    'author' => $module_obj->author,
+                    'active' => $module_obj->active,
+                ];
+            }
+        }
+        else {
+            foreach($modules as $module) {
+                $module_obj = Module::getInstanceById($module['id_module']);
+                $modules_array[] = [
+                    'id_module' => $module_obj->id,
+                    'displayName' => $module_obj->displayName,
+                    'name' => $module_obj->name,
+                    'version' => $module_obj->version,
+                    'author' => $module_obj->author,
+                    'active' => $module_obj->active,
+                ];
+            }
+        }
+        
+
+        if(isset($order_other_by) && isset($order_other_way)) {
+            if($order_other_way == 'desc')
+                krsort($modules_array);
+            else
+                ksort($modules_array);
+        }
+        return $modules_array;
     }
 }
