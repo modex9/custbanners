@@ -79,83 +79,6 @@ class somemodule extends Module {
 
     public function getContent() {
 
-        $this->postProcess();
-
-        $fields_list = array(
-            'id_module' => [
-                'title' => $this->trans('Module ID', [], 'Admin.Global'),
-                'type' => 'text',
-            ],
-            'name' => [
-                'title' => $this->trans('Name', [], 'Admin.Global'),
-                'type' => 'text',
-            ],
-            'displayName' => [
-                'title' => $this->trans('Display Name', [], 'Admin.Global'),
-                'type' => 'text',
-            ],
-            'version' => [
-                'title' => $this->trans('Module Version', [], 'Admin.Global'),
-                'type' => 'text',
-            ],
-            'author' => [
-                'title' => $this->trans('Module Author', [], 'Admin.Global'),
-                'type' => 'text',
-            ],
-            'active' => [
-                'title' => $this->trans('Active', [], 'Admin.Global'),
-                'type' => 'bool',
-                'active' => 'status',
-            ]
-        );
-
-        $modules_array = $this->getModules();
-        $helper = new HelperList();
-        $helper->shopLinkType = '';
-        $helper->identifier = $this->identifier;
-        $helper->table = $this->table;
-        $helper->no_link = true;
-        $helper->show_toolbar = true;
-        $helper->module = $this;
-        $helper->actions = ['configure', 'translate'];
-        $helper->orderBy = 'id_module';
-        $helper->listTotal = count($modules_array);
-        $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-
-        return $helper->generateList($modules_array, $fields_list);
-    }
-    
-    public function postProcess() {
-        if (Tools::isSubmit('statusmodule') && Tools::getValue('id_module'))
-        {
-            // Change status of module
-            $id_module = Tools::getValue('id_module');
-            if (!$id_module || !Validate::isUnsignedId($id_module))
-            {
-                $this->_errors[] = $this->l('Invalid module ID.');
-                return false;
-            }
-
-            $module = Module::getInstanceById($id_module);
-            if (!Validate::isLoadedObject($module))
-            {
-                $this->_errors[] = $this->l('Can\'t find module with this ID.');
-                return false;
-            }
-
-            if($module->active)
-            {
-                return $module->disable();
-            }
-            else {
-                return $module->enable();
-            }
-            Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true, [], [
-                'configure' => $this->name,
-            ]));
-        }
     }
 
     public function displayConfigureLink($token, $id, $name = null)
@@ -184,6 +107,7 @@ class somemodule extends Module {
             'action' => Context::getContext()->getTranslator()->trans('Translate', array(), 'Admin.Actions'),
             'id' => $id,
             'translateLinks' => $this->getModuleTranslationLinks($name),
+            'module_languages' => Language::getLanguages(false),
         ));
         return $this->fetch('module:somemodule/views/templates/admin/list_action_translate.tpl');
     }
