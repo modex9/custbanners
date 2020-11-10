@@ -46,7 +46,9 @@ class AdminModuleListController extends ModuleAdminController
         $helper->no_link = true;
         $helper->show_toolbar = true;
         $helper->module = $this->module;
-        $helper->actions = ['configure', 'translate'];
+        $helper->actions = ['configure'];
+        if(Configuration::get('MM_TRANS_LINKS'))
+            $helper->actions[] = 'translate';
         $helper->orderBy = 'id_module';
         $helper->listTotal = count($modules_array);
         $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
