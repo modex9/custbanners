@@ -60,6 +60,7 @@ class AdminModuleListController extends ModuleAdminController
         $helper->tpl_vars = [
             'bg_color' => Configuration::get('MM_BACKGROUND_COLOR'),
             'list_text_color' => Configuration::get('MM_LIST_COLOR'),
+            'list_bold' => Configuration::get('MM_BOLD_TEXT'),
         ];
 
         return $helper->generateList($modules_array, $fields_list);

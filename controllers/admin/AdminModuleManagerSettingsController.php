@@ -46,6 +46,25 @@ class AdminModuleManagerSettingsController extends ModuleAdminController
                     'label' => 'Text Color',
                     'name' => 'MM_LIST_COLOR',
                 ],
+                [
+                    'type' => 'switch',
+                    'label' => 'Bold Text',
+                    'name' => 'MM_BOLD_TEXT',
+                    'is_bool' => true,
+                    'values' =>
+                        [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->module->getTranslator()->trans('Yes', [], 'Admin.Global')
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->module->getTranslator()->trans('No', [], 'Admin.Global')
+                            ]
+                        ],
+                ],
 
             ],
             'submit' => [
@@ -60,6 +79,7 @@ class AdminModuleManagerSettingsController extends ModuleAdminController
             'MM_CUSTOM_INFO' => Configuration::get('MM_CUSTOM_INFO'),
             'MM_BACKGROUND_COLOR' => Configuration::get('MM_BACKGROUND_COLOR'),
             'MM_LIST_COLOR' => Configuration::get('MM_LIST_COLOR'),
+            'MM_BOLD_TEXT' => Configuration::get('MM_BOLD_TEXT'),
         ];
     }
 
