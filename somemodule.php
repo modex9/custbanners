@@ -184,6 +184,7 @@ class somemodule extends Module {
                     'version' => $module_obj->version,
                     'author' => $module_obj->author,
                     'active' => $module_obj->active,
+                    'color' => Configuration::get('MM_BACKGROUND_COLOR'),
                 ];
             }
         }

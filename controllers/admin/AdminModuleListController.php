@@ -46,6 +46,7 @@ class AdminModuleListController extends ModuleAdminController
         $helper->no_link = true;
         $helper->show_toolbar = true;
         $helper->module = $this->module;
+        $helper->colorOnBackground = 1;
         $helper->actions = ['configure'];
         if(Configuration::get('MM_TRANS_LINKS'))
             $helper->actions[] = 'translate';
