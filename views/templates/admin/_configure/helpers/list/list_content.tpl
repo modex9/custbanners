@@ -19,7 +19,8 @@
                     <td style="
                             {if isset($bg_color) && $color_on_bg}background-color: {$bg_color};{/if}
                             {if isset($list_text_color)} color: {$list_text_color};{/if}
-                            {if isset($list_bold) && $list_bold} font-weight: bold;{/if}"
+                            {if isset($list_bold) && $list_bold} font-weight: bold;{/if}
+                            {if isset($list_font_size)} font-size: {$list_font_size}px;{/if}"
                     {if isset($params.position)}
                         id="td_{if !empty($position_group_identifier)}{$position_group_identifier}{else}0{/if}_{$tr.$identifier}{if $smarty.capture.tr_count > 1}_{($smarty.capture.tr_count - 1)|intval}{/if}"
                     {/if}

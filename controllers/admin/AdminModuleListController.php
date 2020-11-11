@@ -61,6 +61,7 @@ class AdminModuleListController extends ModuleAdminController
             'bg_color' => Configuration::get('MM_BACKGROUND_COLOR'),
             'list_text_color' => Configuration::get('MM_LIST_COLOR'),
             'list_bold' => Configuration::get('MM_BOLD_TEXT'),
+            'list_font_size' => Configuration::get('MM_LIST_FONT_SIZE'),
         ];
 
         return $helper->generateList($modules_array, $fields_list);
