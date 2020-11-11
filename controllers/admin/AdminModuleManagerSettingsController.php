@@ -40,7 +40,12 @@ class AdminModuleManagerSettingsController extends ModuleAdminController
                     'type' => 'color',
                     'label' => 'Background Color',
                     'name' => 'MM_BACKGROUND_COLOR',
-                ], 
+                ],
+                [
+                    'type' => 'color',
+                    'label' => 'Text Color',
+                    'name' => 'MM_LIST_COLOR',
+                ],
 
             ],
             'submit' => [
@@ -54,6 +59,7 @@ class AdminModuleManagerSettingsController extends ModuleAdminController
             'MM_TRANS_LINKS' => Configuration::get('MM_TRANS_LINKS'),
             'MM_CUSTOM_INFO' => Configuration::get('MM_CUSTOM_INFO'),
             'MM_BACKGROUND_COLOR' => Configuration::get('MM_BACKGROUND_COLOR'),
+            'MM_LIST_COLOR' => Configuration::get('MM_LIST_COLOR'),
         ];
     }
 

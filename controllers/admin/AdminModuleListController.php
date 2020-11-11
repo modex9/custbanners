@@ -57,6 +57,10 @@ class AdminModuleListController extends ModuleAdminController
         $controllerName = substr($className, 0, strlen($className) - 10);
         $helper->token = Tools::getAdminTokenLite($controllerName);
         $helper->currentIndex = Context::getContext()->link->getAdminLink($controllerName, false);
+        $helper->tpl_vars = [
+            'bg_color' => Configuration::get('MM_BACKGROUND_COLOR'),
+            'list_text_color' => Configuration::get('MM_LIST_COLOR'),
+        ];
 
         return $helper->generateList($modules_array, $fields_list);
     }
