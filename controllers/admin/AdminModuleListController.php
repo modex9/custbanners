@@ -15,6 +15,9 @@ class AdminModuleListController extends ModuleAdminController
         $this->list_no_link = true;
         $this->colorOnBackground = true;
         $this->bootstrap = true;
+        $this->actions = ['configure'];
+        if(Configuration::get('MM_TRANS_LINKS'))
+            $this->actions[] = 'translate';
         $this->fields_list = [
             'id_module' => [
                 'title' => $this->trans('Module ID', [], 'Admin.Global'),
@@ -27,7 +30,8 @@ class AdminModuleListController extends ModuleAdminController
             'displayName' => [
                 'title' => $this->trans('Display Name', [], 'Admin.Global'),
                 'type' => 'text',
-                'callback' => 'getModuleDisplayName'
+                'callback' => 'getModuleDisplayName',
+                'search' => false,
             ],
             'version' => [
                 'title' => $this->trans('Module Version', [], 'Admin.Global'),
@@ -36,7 +40,8 @@ class AdminModuleListController extends ModuleAdminController
             'author' => [
                 'title' => $this->trans('Module Author', [], 'Admin.Global'),
                 'type' => 'text',
-                'callback' => 'getModuleAuthor'
+                'callback' => 'getModuleAuthor',
+                'search' => false,
             ],
             'active' => [
                 'title' => $this->trans('Active', [], 'Admin.Global'),
@@ -79,6 +84,8 @@ class AdminModuleListController extends ModuleAdminController
             }
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminModuleList'));
         }
+        else
+            parent::postProcess();
     }
 
     public function getModuleDisplayName($module_name)
@@ -102,5 +109,6 @@ class AdminModuleListController extends ModuleAdminController
     {
         parent::setHelperDisplay($helper);
         $this->helper->bulk_actions = false;
+        $this->helper->module = $this->module;
     }
 }
