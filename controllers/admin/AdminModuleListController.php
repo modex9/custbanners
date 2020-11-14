@@ -111,4 +111,11 @@ class AdminModuleListController extends ModuleAdminController
         $this->helper->bulk_actions = false;
         $this->helper->module = $this->module;
     }
+
+    public function setMedia($isNewTheme = false)
+    {
+        parent::setMedia($isNewTheme);
+        $this->addJS(_PS_MODULE_DIR_ . $this->module->name . '/views/js/module_list.js');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin.css');
+    }
 }

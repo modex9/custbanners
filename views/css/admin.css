@@ -1,13 +1,3 @@
-@media (min-width: 991px) {
-    #table-module tbody>tr:hover>td {
-        background-color: #c9ddf5;
-    }
-}
-
-#table-module tbody>tr>td, .title_box {
-    font-size: 14px;
-}
-
-#table-module tbody>tr:hover>td {
-    font-weight: bold;
+.translate-block.btn {
+    padding: 0;
 }
