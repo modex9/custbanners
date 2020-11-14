@@ -160,4 +160,42 @@ class somemodule extends Module {
         }
         return $translateLinks;
     }
+
+    public function initModulesPositions()
+    {
+        $sql = "SELECT `id_module` FROM " . _DB_PREFIX_ . "module ORDER BY `id_module`";
+        $modules = Db::getInstance()->executeS($sql);
+        $result = true;
+        $i = 0;
+        foreach ($modules as $module)
+        {
+            $id_module = $module['id_module'];
+            $result &= Db::getInstance()->update('module', array('position' => $i), 'id_module = ' . (int) $id_module);
+            $i++;
+        }
+        return $result;
+    }
+
+    public function hookActionModuleInstallAfter($params)
+    {
+        $module = $params['object'];
+        $id_module = $module->id;
+        //Get the last position
+        $last_position = Db::getInstance()->getValue('SELECT `position` FROM '. _DB_PREFIX_ . 'module  ORDER BY `position` DESC');
+        Db::getInstance()->update('module', array('position' => $last_position + 1), 'id_module = ' . (int) $id_module);
+    }
+
+    public function hookActionModuleUninstallAfter($params)
+    {
+        $module = $params['module'];
+        if($module !== $this && isset($module->position))
+        {
+            //Get modules with only higher positions, and reduce them by 1.
+            $modules_upper = Db::getInstance()->executeS("SELECT `id_module`, `position` FROM " . _DB_PREFIX_ . "module WHERE `position` > " . $module->position);
+            foreach ($modules_upper as $module)
+            {
+                Db::getInstance()->update('module', array('position' => $module['position'] - 1), 'id_module = ' . (int) $module['id_module']);
+            }
+        }
+    }
 }
