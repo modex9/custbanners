@@ -78,7 +78,7 @@ class somemodule extends Module {
     }
 
     public function getContent() {
-
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminModuleList'));
     }
 
     public function displayConfigureLink($token, $id, $name = null)
