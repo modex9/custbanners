@@ -136,10 +136,4 @@ class somemodule extends Module {
         }
         return $translateLinks;
     }
-
-    public function hookDisplayBackofficeHeader($params) {
-        if (Tools::getIsset('configure') && Tools::getValue('configure') == $this->name) {
-            $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
-        }
-    }
 }
