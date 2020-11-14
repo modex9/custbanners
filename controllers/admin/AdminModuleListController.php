@@ -22,6 +22,8 @@ class AdminModuleListController extends ModuleAdminController
             'id_module' => [
                 'title' => $this->trans('Module ID', [], 'Admin.Global'),
                 'type' => 'text',
+                'class' => 'fixed-width-xs',
+                'align' => 'center',
             ],
             'name' => [
                 'title' => $this->trans('Name', [], 'Admin.Global'),
@@ -36,6 +38,8 @@ class AdminModuleListController extends ModuleAdminController
             'version' => [
                 'title' => $this->trans('Module Version', [], 'Admin.Global'),
                 'type' => 'text',
+                'class' => 'fixed-width-xs',
+                'align' => 'center',
             ],
             'author' => [
                 'title' => $this->trans('Module Author', [], 'Admin.Global'),
@@ -47,6 +51,7 @@ class AdminModuleListController extends ModuleAdminController
                 'title' => $this->trans('Active', [], 'Admin.Global'),
                 'type' => 'bool',
                 'active' => 'status',
+                'align' => 'center',
             ]
         ];
         $this->tpl_list_vars = [
