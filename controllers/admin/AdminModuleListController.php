@@ -6,11 +6,16 @@ class AdminModuleListController extends ModuleAdminController
     public function __construct()
     {
         parent::__construct();
+        $this->_select = "a.name AS displayName, a.name AS author";
+        $this->shopLinkType = '';
+        $this->table = 'module';
+        $this->_orderBy = 'id_module';
+        $this->toolbar_btn = false;
+        $this->identifier = 'id_module';
+        $this->list_no_link = true;
+        $this->colorOnBackground = true;
         $this->bootstrap = true;
-    }
-
-    public function renderList() {
-        $fields_list = array(
+        $this->fields_list = [
             'id_module' => [
                 'title' => $this->trans('Module ID', [], 'Admin.Global'),
                 'type' => 'text',
@@ -22,6 +27,7 @@ class AdminModuleListController extends ModuleAdminController
             'displayName' => [
                 'title' => $this->trans('Display Name', [], 'Admin.Global'),
                 'type' => 'text',
+                'callback' => 'getModuleDisplayName'
             ],
             'version' => [
                 'title' => $this->trans('Module Version', [], 'Admin.Global'),
@@ -30,41 +36,20 @@ class AdminModuleListController extends ModuleAdminController
             'author' => [
                 'title' => $this->trans('Module Author', [], 'Admin.Global'),
                 'type' => 'text',
+                'callback' => 'getModuleAuthor'
             ],
             'active' => [
                 'title' => $this->trans('Active', [], 'Admin.Global'),
                 'type' => 'bool',
                 'active' => 'status',
             ]
-        );
-
-        $modules_array = $this->module->getModules();
-        $helper = new HelperList();
-        $helper->shopLinkType = '';
-        $helper->identifier = 'id_module';
-        $helper->table = 'module';
-        $helper->no_link = true;
-        $helper->show_toolbar = true;
-        $helper->module = $this->module;
-        $helper->colorOnBackground = 1;
-        $helper->actions = ['configure'];
-        if(Configuration::get('MM_TRANS_LINKS'))
-            $helper->actions[] = 'translate';
-        $helper->orderBy = 'id_module';
-        $helper->listTotal = count($modules_array);
-        $helper->title = $this->trans('Module list', array(), 'Modules.Mainmenu.Admin');
-        $className = get_class($this);
-        $controllerName = substr($className, 0, strlen($className) - 10);
-        $helper->token = Tools::getAdminTokenLite($controllerName);
-        $helper->currentIndex = Context::getContext()->link->getAdminLink($controllerName, false);
-        $helper->tpl_vars = [
+        ];
+        $this->tpl_list_vars = [
             'bg_color' => Configuration::get('MM_BACKGROUND_COLOR'),
             'list_text_color' => Configuration::get('MM_LIST_COLOR'),
             'list_bold' => Configuration::get('MM_BOLD_TEXT'),
             'list_font_size' => Configuration::get('MM_LIST_FONT_SIZE'),
         ];
-
-        return $helper->generateList($modules_array, $fields_list);
     }
 
     public function postProcess() {
@@ -94,5 +79,28 @@ class AdminModuleListController extends ModuleAdminController
             }
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminModuleList'));
         }
+    }
+
+    public function getModuleDisplayName($module_name)
+    {
+        $module = Module::getInstanceByName($module_name);
+        return $module->displayName;
+    }
+
+    public function getModuleAuthor($module_name)
+    {
+        $module = Module::getInstanceByName($module_name);
+        return $module->author;
+    }
+
+    public function initToolbar()
+    {
+        $this->toolbar_btn = [];
+    }
+
+    public function setHelperDisplay(Helper $helper)
+    {
+        parent::setHelperDisplay($helper);
+        $this->helper->bulk_actions = false;
     }
 }
