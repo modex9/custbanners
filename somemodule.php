@@ -14,7 +14,31 @@ class somemodule extends Module {
     }
 
     public function install() {
-        return parent::install() && $this->registerHook('backofficeHeader') && $this->installAdminTabs();
+
+        $cols = Db::getInstance()->ExecuteS('describe ' . _DB_PREFIX_ . 'module');
+        $positions_col_exists = false;
+        foreach ($cols as $col)
+        {
+            if($col['Field'] == 'position')
+            {
+                $positions_col_exists = true;
+                break;
+            }
+        }
+        $res = true;
+        if(!$positions_col_exists)
+        {
+            $sql = "ALTER TABLE `" ._DB_PREFIX_ ."module` ADD `position` int(10) NULL;
+                    ALTER TABLE `" ._DB_PREFIX_ ."module`
+                    ADD UNIQUE KEY `position` (`position`)";
+            $res &= Db::getInstance()->execute($sql);
+            $res &= $this->initModulesPositions();
+        }
+        $res &= $this->initModulesPositions();
+        return $res && parent::install()
+            && $this->registerHook('actionModuleInstallAfter')
+            && $this->registerHook('actionModuleUninstallAfter')
+            && $this->installAdminTabs();
     }
 
     public function uninstall() {
