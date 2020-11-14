@@ -134,7 +134,13 @@
             {/foreach}
 
             {if $multishop_active && $shop_link_type}
-                <td title="{$tr.shop_name}">
+                <td title="{$tr.shop_name}"
+                    style="
+                    {if isset($bg_color) && $color_on_bg}background-color: {$bg_color};{/if}
+                    {if isset($list_text_color)} color: {$list_text_color};{/if}
+                    {if isset($list_bold) && $list_bold} font-weight: bold;{/if}
+                    {if isset($list_font_size)} font-size: {$list_font_size}px;{/if}"
+                >
                     {if isset($tr.shop_short_name)}
                         {$tr.shop_short_name}
                     {else}
