@@ -28,9 +28,9 @@ class somemodule extends Module {
         $res = true;
         if(!$positions_col_exists)
         {
-            $sql = "ALTER TABLE `" ._DB_PREFIX_ ."module` ADD `position` int(10) NULL;
-                    ALTER TABLE `" ._DB_PREFIX_ ."module`
-                    ADD UNIQUE KEY `position` (`position`)";
+            $sql = "ALTER TABLE `" ._DB_PREFIX_ ."module` ADD `position` int(10) NULL;";
+//                    ALTER TABLE `" ._DB_PREFIX_ ."module`
+//                    ADD UNIQUE KEY `position` (`position`)";
             $res &= Db::getInstance()->execute($sql);
             $res &= $this->initModulesPositions();
         }

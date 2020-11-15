@@ -9,9 +9,10 @@ class AdminModuleListController extends ModuleAdminController
         $this->_select = "a.name AS displayName, a.name AS author";
         $this->shopLinkType = '';
         $this->table = 'module';
-        $this->_orderBy = 'id_module';
+        $this->_orderBy = 'position';
         $this->toolbar_btn = false;
         $this->identifier = 'id_module';
+        $this->position_identifier = 'id_module';
         $this->list_no_link = true;
         $this->colorOnBackground = true;
         $this->bootstrap = true;
@@ -19,6 +20,12 @@ class AdminModuleListController extends ModuleAdminController
         if(Configuration::get('MM_TRANS_LINKS'))
             $this->actions[] = 'translate';
         $this->fields_list = [
+            'position' => [
+                'title' => $this->trans('Position', array(), 'Admin.Global'),
+                'position' => 'position',
+                'align' => 'center',
+                'class' => 'fixed-width-xs',
+            ],
             'id_module' => [
                 'title' => $this->trans('Module ID', [], 'Admin.Global'),
                 'type' => 'text',
@@ -76,7 +83,7 @@ class AdminModuleListController extends ModuleAdminController
             $module = Module::getInstanceById($id_module);
             if (!Validate::isLoadedObject($module))
             {
-                $this->_errors[] = $this->l('Can\'t find module with this ID.');
+                $this->errors[] = $this->trans('Can\'t find module with this ID.', [], 'Shop.Theme.Global');
                 return false;
             }
 
@@ -122,5 +129,48 @@ class AdminModuleListController extends ModuleAdminController
         parent::setMedia($isNewTheme);
         $this->addJS(_PS_MODULE_DIR_ . $this->module->name . '/views/js/module_list.js');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin.css');
+    }
+
+    public function ajaxProcessUpdatePositions()
+    {
+        $new_rows = Tools::getValue($this->table);
+
+        $id_module = Tools::getValue('id', 0);
+
+        // dnd uses growl to display messages, but it only displays the success messages, so errors are useless for now...
+        if($id_module < 1)
+        {
+            $error =  $this->trans('Invalid module ID: %s', [$id_module], 'Shop.Theme.Global');
+            echo '{"hasError" : true, "errors" : "'.$error.'"}';
+        }
+
+        $new_pos = $old_pos = 0;
+        $paginatinon = Tools::getValue('selected_pagination');
+        $page = Tools::getValue('page');
+        foreach ($new_rows as $i => $row)
+        {
+            $row_elements = explode('_', $row);
+            if(count($row_elements) != 4)
+                continue;
+            if($row_elements[2] == $id_module)
+            {
+                $old_pos = $row_elements[3];
+                $new_pos = $i + ($page - 1) * $paginatinon;
+                break;
+            }
+        }
+        //todo: check if way is 0 or 1, error if otherwise
+        $way = Tools::getValue('way', -1);
+
+        //if way: 0, get old position and new position. Update all positions, which are greater than new position and less then the old 1, by adding 1.
+        //if way: 1, get old position and new position. Update all positions, which are greater than old position and less then the new 1, by subtracting 1.
+        if(in_array($way, [0, 1]) && $old_pos >= 0 && $new_pos >= 0 && ($old_pos !== $new_pos))
+        {
+            Db::getInstance()->update('module', ['position' => [
+                'type' => 'sql',
+                'value' => '`position`' . ($way ? " - 1" : " + 1")
+            ]], "`position` >= " . ($way ? $old_pos : $new_pos) . " AND `position` <= " . ($way ? $new_pos : $old_pos));
+            Db::getInstance()->update('module', ['position' => $new_pos], "`id_module` = " . $id_module);
+        }
     }
 }
